@@ -22,7 +22,6 @@ func (s *Socket)readBuf(buf *[]byte,n uint32)error{
 	return err
 }
 func (s *Socket)StartRead(readObject IRead ,duration time.Duration){
-	fmt.Println("start read")
 	defer s.Conn.Close()
 	for{
 		headBuf := make([]byte, 4)
@@ -37,11 +36,13 @@ func (s *Socket)StartRead(readObject IRead ,duration time.Duration){
 		fmt.Println("recv len:",l)
 		if err != nil{
 			readObject.read(s,[]byte(""),err)
+			return
 		}
 		var bodyBuf = make([]byte,l - 4)
 		err = s.readBuf(&bodyBuf,l - 4)
 		if err != nil{
 			readObject.read(s,[]byte(""),err)
+			return
 		}else{
 			readObject.read(s,bodyBuf,nil)
 		}

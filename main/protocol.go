@@ -13,13 +13,13 @@ const (
 	MSG_TYPE_CLEAR = uint8(1 << 7)
 
 	MSG_TYPE_PUB = uint8(1)
-	MSG_TYPE_SUB = uint8(3)
-	MSG_TYPE_TEXT = uint8(2)
+	MSG_TYPE_SUB = uint8(2)
+	MSG_TYPE_TEXT = uint8(4)
 
-	MSG_TYPE_SUB_APPEND = 0x13
-	MSG_TYPE_SUB_DEL = 0x23
-	MSG_TYPE_SUB_REPLACE = 0x43
-	MSG_TYPE_SUB_CLEAR = 0x83
+	MSG_TYPE_SUB_APPEND = 0x12
+	MSG_TYPE_SUB_DEL = 0x22
+	MSG_TYPE_SUB_REPLACE = 0x42
+	MSG_TYPE_SUB_CLEAR = 0x82
 
 	PACKAGE_LEN_MAX = uint64(1) << 32
 	SINGLE_BODY_LEN_MAX = uint32(1) << 20
@@ -86,8 +86,7 @@ func unpack(ba []byte)(protoMsgInfo,error){
 	if err != nil{
 		return protoMsgInfo{},err
 	}
-	var mi protoMsgInfo = protoMsgInfo{0,0,0,make([]uint32,length),make([][]byte,length)}
-
+	var mi protoMsgInfo = protoMsgInfo{0,length,0,make([]uint32,length),make([][]byte,length)}
 	err = binary.Read(bytesBuf,binary.LittleEndian,&mi.msgType)
 	if err != nil{
 		return protoMsgInfo{},err

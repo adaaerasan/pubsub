@@ -10,7 +10,7 @@ func main(){
 	var sv = Server{}
 	go sv.StartServer("localhost:10000")
 	go pub()
-	//go sub()
+	go sub()
 	var ch = make(chan int)
 	<-ch
 }
@@ -27,11 +27,21 @@ func(ss *subSock)read(sock *Socket,ba []byte,err error){
 		return
 	}
 	fmt.Println(mi.msgType)
+	fmt.Println("------------------",string(mi.body[0]))
+/*	var tmpmi protoMsgInfo
+	tmpmi.body = append(tmpmi.body,[]byte(chanelTest))
+	tmpmi.body = append(tmpmi.body,[]byte("replace"))
+	tmpmi.msgType = MSG_TYPE_SUB_REPLACE
+	tmpba,_ := pack(tmpmi)
+	sock.Send(tmpba,time.Duration(2)*time.Second)*/
 }
 var chanelTest = "channelTest"
 func sub(){
+	fmt.Println("start sub")
 	for{
-		time.Sleep(3*time.Second)
+		fmt.Println("start sub1")
+		time.Sleep(5*time.Second)
+		fmt.Println("start sub2")
 		conn, err := net.Dial("tcp", "127.0.0.1:10000")
 		if err != nil{
 			fmt.Println(err.Error())
@@ -41,7 +51,9 @@ func sub(){
 		var mi protoMsgInfo
 		mi.body = append(mi.body,[]byte(chanelTest))
 		mi.msgType = MSG_TYPE_SUB_APPEND
+		fmt.Println("start sub3")
 		ba,_ := pack(mi)
+		fmt.Println(mi.blockLen)
 		conn.Write(ba)
 		var sock = Socket{conn}
 		var r = subSock{}
