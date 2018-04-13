@@ -62,13 +62,5 @@ func (s *Socket)Send(ba []byte,duration time.Duration)error{
 	}
 	return nil
 }
-func (s *Socket)unpack(ba []byte){
 
-}
-func (s *Socket)pack()[]byte{
-//	var des []byte
-//	var l = len(ba)
-
-	return nil
-}
 
