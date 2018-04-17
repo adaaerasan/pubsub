@@ -129,11 +129,8 @@ func (s *Server)processMsgSub(sock *Socket,mi protoMsgInfo)error{
 }
 
 func (s *Server)processSaveMsg(sock *Socket,mi protoMsgInfo)error{
-	var remodAddr = sock.Conn.RemoteAddr().String()
-	var h = getHash(remodAddr)
-	s.slock.Lock()
-	s.saveMap[h] = sock
-	s.slock.Unlock()
+	s.sl.AddServer(sock)
+
 	return nil
 }
 func (s *Server)parseMsg(sock *Socket,mi protoMsgInfo)error{
