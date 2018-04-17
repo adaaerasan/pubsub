@@ -3,6 +3,7 @@ package main
 import (
 	"sort"
 	"sync"
+	"fmt"
 )
 
 type serverInfo struct{
@@ -31,13 +32,16 @@ type saveServer struct{
 	lock sync.RWMutex
 }
 
-func(s *saveServer)AddServer(sock *Socket){
+func(s *saveServer)AddServer(sock *Socket,count int){
 	s.lock.Lock()
 	var addr = sock.Conn.RemoteAddr().String()
-	var si serverInfo
-	si.hash = getHash(addr)
-	si.s = sock
-	s.sl = append(s.sl,si)
+	for i := 0;i<count;i++{
+		var si serverInfo
+		var addr_tmp = addr + fmt.Sprintf("%d",i)
+		si.hash = getHash(addr_tmp)
+		si.s = sock
+		s.sl = append(s.sl,si)
+	}
 	sort.Sort(&s.sl)
 	s.lock.Unlock()
 }

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"encoding/binary"
 )
 
 
@@ -129,7 +130,16 @@ func (s *Server)processMsgSub(sock *Socket,mi protoMsgInfo)error{
 }
 
 func (s *Server)processSaveMsg(sock *Socket,mi protoMsgInfo)error{
-	s.sl.AddServer(sock)
+	var count = 150
+	if mi.blockLen == 1{
+		var param1 = mi.body[0]
+		fmt.Println(binary.BigEndian.Uint32(param1))
+		c := binary.LittleEndian.Uint32(param1)
+		if c == 0{
+			c = uint32(count)
+		}
+	}
+	s.sl.AddServer(sock,count)
 
 	return nil
 }
