@@ -15,6 +15,7 @@ const (
 	MSG_TYPE_PUB = uint8(1)
 	MSG_TYPE_SUB = uint8(2)
 	MSG_TYPE_TEXT = uint8(4)
+	MSG_TYPE_SAVE = uint8(8)
 
 	MSG_TYPE_SUB_APPEND = 0x12
 	MSG_TYPE_SUB_DEL = 0x22

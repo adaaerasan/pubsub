@@ -25,6 +25,7 @@ func (s *Socket)StartRead(readObject IRead ,duration time.Duration){
 	defer s.Conn.Close()
 	for{
 		headBuf := make([]byte, 4)
+		s.Conn.SetReadDeadline(time.Now().Add(duration))
 		err := s.readBuf(&headBuf,4)
 		fmt.Println("readheader")
 		if err != nil{
@@ -52,6 +53,7 @@ func (s *Socket)Send(ba []byte,duration time.Duration)error{
 	var l = len(ba)
 	var writeLen = 0
 	for{
+		s.Conn.SetWriteDeadline(time.Now().Add(duration))
 		n,err := s.Conn.Write(ba)
 		if err != nil{
 			return err

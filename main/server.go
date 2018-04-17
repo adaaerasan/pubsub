@@ -12,6 +12,7 @@ import (
 type Server struct{
 	channelMap map[string]map[*Socket]bool
 	lock sync.RWMutex
+	sl saveServer
 }
 func (s *Server)read(sock *Socket,ba []byte,err error){
 	if err != nil{
@@ -43,10 +44,19 @@ func (s * Server)processMsgPub(sock *Socket,mi protoMsgInfo)error{
 				fmt.Println("send msg------",string(mi.body[1]))
 				tmi.msgType = MSG_TYPE_TEXT
 				ba,_ := pack(tmi)
-				k.Send(ba,time.Duration(2))
+				k.Send(ba,time.Duration(2)*time.Second)
 			}
 		}
 		s.lock.RUnlock()
+		saveSock := s.sl.GetServer(c)
+		if saveSock != nil{
+			var tmi protoMsgInfo
+			tmi.body = append(tmi.body,mi.body[0])
+			tmi.body = append(tmi.body,mi.body[1])
+			tmi.msgType = MSG_TYPE_SAVE
+			ba,_ := pack(tmi)
+			saveSock.Send(ba,time.Duration(2)*time.Second)
+		}
 	}else{
 		return errors.New("pub parameter")
 	}
@@ -117,11 +127,22 @@ func (s *Server)processMsgSub(sock *Socket,mi protoMsgInfo)error{
 	}
 	return nil
 }
+
+func (s *Server)processSaveMsg(sock *Socket,mi protoMsgInfo)error{
+	var remodAddr = sock.Conn.RemoteAddr().String()
+	var h = getHash(remodAddr)
+	s.slock.Lock()
+	s.saveMap[h] = sock
+	s.slock.Unlock()
+	return nil
+}
 func (s *Server)parseMsg(sock *Socket,mi protoMsgInfo)error{
 	if mi.msgType & MSG_TYPE_PUB == MSG_TYPE_PUB{
 		return s.processMsgPub(sock,mi)
 	}else if mi.msgType & MSG_TYPE_SUB == MSG_TYPE_SUB{
 		return s.processMsgSub(sock,mi)
+	}else if mi.msgType == MSG_TYPE_SAVE{
+		return s.processSaveMsg(sock,mi)
 	}else{
 		return errors.New("not support msgtype")
 	}
